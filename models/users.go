@@ -1,6 +1,9 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/meanii/api.wisper/clients"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type User struct {
 	Id       primitive.ObjectID   `json:"id,omitempty"`
@@ -8,3 +11,5 @@ type User struct {
 	Password string               `json:"password,omitempty" validate:"required"`
 	Friends  []primitive.ObjectID `json:"friends,omitempty"`
 }
+
+var UserModel = clients.GetDatabase().Collection("Users")

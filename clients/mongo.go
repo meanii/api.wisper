@@ -3,11 +3,12 @@ package clients
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/meanii/api.wisper/configs"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"time"
 )
 
 type Mongo struct{}
