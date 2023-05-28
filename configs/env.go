@@ -8,9 +8,11 @@ import (
 )
 
 type Envs struct {
-	Port     string
-	MongoUrl string
-	RedisUrl string
+	Port         string
+	MongoUrl     string
+	RedisUrl     string
+	SecretToken  string
+	RefreshToken string
 }
 
 // LoadEnv loads the .env file
@@ -23,6 +25,8 @@ func (e *Envs) LoadEnv() {
 	e.MongoUrl = os.Getenv("MONGO_URI")
 	e.RedisUrl = os.Getenv("REDIS_URI")
 	e.Port = os.Getenv("PORT")
+	e.SecretToken = os.Getenv("SECRET_TOKEN")
+	e.RefreshToken = os.Getenv("REFRESH_TOKEN")
 }
 
 var EnvInstance *Envs
