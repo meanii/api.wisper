@@ -41,53 +41,33 @@ func (u *User) signup() {
 		defer cancel()
 
 		if err := c.BodyParser(&user); err != nil {
-			return c.Status(http.StatusBadRequest).JSON(utils.Responses{
-				Status:  http.StatusBadRequest,
-				Message: fmt.Sprintf("something went wrong! ERROR: %s", err.Error()),
-			})
+			return utils.ResponsesModel.Error(c, http.StatusBadRequest, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
 
 		if validationErr := validate.Struct(user); validationErr != nil {
-			return c.Status(http.StatusBadRequest).JSON(utils.Responses{
-				Status:  http.StatusBadRequest,
-				Message: "validation has been failed! ERROR: " + validationErr.Error(),
-			})
+			return utils.ResponsesModel.Error(c, http.StatusBadRequest, fmt.Sprintf("something went wrong! ERROR: %s", validationErr.Error()))
 		}
 
 		// check if user already exists
 		var userExists models.User
 		if err := models.UserModel.FindOne(ctx, bson.M{"username": user.Username}).Decode(&userExists); err == nil {
-			return c.Status(http.StatusBadRequest).JSON(utils.Responses{
-				Status:  http.StatusBadRequest,
-				Message: "user already exists!",
-			})
+			return utils.ResponsesModel.Error(c, http.StatusBadRequest, fmt.Sprintf("user already exists!"))
 		}
 
 		// encrypt password
 		hash, err := utils.Hash(user.Password)
 		if err != nil {
-			return c.Status(http.StatusInternalServerError).JSON(utils.Responses{
-				Status:  http.StatusInternalServerError,
-				Message: fmt.Sprintf("something went wrong! ERROR: %s", err.Error()),
-			})
+			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
 		user.Password = hash
 
 		// insert user
 		result, err := models.UserModel.InsertOne(ctx, user)
 		if err != nil {
-			return c.Status(http.StatusInternalServerError).JSON(utils.Responses{
-				Status:  http.StatusInternalServerError,
-				Message: fmt.Sprintf("something went wrong! ERROR: %s", err.Error()),
-			})
+			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
 
-		return c.Status(201).JSON(utils.Responses{
-			Status:  http.StatusCreated,
-			Message: "user has been created!",
-			Data:    &fiber.Map{"id": result.InsertedID},
-		})
-
+		return utils.ResponsesModel.Success(c, &fiber.Map{"id": result.InsertedID})
 	})
 }
 
@@ -99,42 +79,28 @@ func (u *User) login() {
 		defer cancel()
 
 		if err := c.BodyParser(&user); err != nil {
-			return c.Status(http.StatusBadRequest).JSON(utils.Responses{
-				Status:  http.StatusBadRequest,
-				Message: fmt.Sprintf("something went wrong! ERROR: %s", err.Error()),
-			})
+			return utils.ResponsesModel.Error(c, http.StatusBadRequest, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
 
 		if validationErr := validate.Struct(user); validationErr != nil {
-			return c.Status(http.StatusBadRequest).JSON(utils.Responses{
-				Status:  http.StatusBadRequest,
-				Message: "validation has been failed! ERROR: " + validationErr.Error(),
-			})
+			return utils.ResponsesModel.Error(c, http.StatusBadRequest, "validation has been failed! ERROR: "+validationErr.Error())
 		}
 
 		result := models.UserModel.FindOne(ctx, bson.M{"username": user.Username})
 		if result.Err() != nil {
-			return c.Status(http.StatusUnauthorized).JSON(utils.Responses{
-				Status:  http.StatusUnauthorized,
-				Message: "username or password is incorrect!",
-			})
+			return utils.ResponsesModel.Error(c, http.StatusUnauthorized, "username or password is incorrect!")
 		}
 
 		var foundUser models.User
 		err := result.Decode(&foundUser)
+
 		if err != nil {
-			return c.Status(http.StatusInternalServerError).JSON(utils.Responses{
-				Status:  http.StatusInternalServerError,
-				Message: "something went wrong!",
-			})
+			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
 
 		// validate password
 		if err := utils.Verify(user.Password, foundUser.Password); err != nil {
-			return c.Status(http.StatusUnauthorized).JSON(utils.Responses{
-				Status:  http.StatusUnauthorized,
-				Message: "username or password is incorrect!",
-			})
+			return utils.ResponsesModel.Error(c, http.StatusUnauthorized, "username or password is incorrect!")
 		}
 
 		// generate token
@@ -148,26 +114,16 @@ func (u *User) login() {
 		// generate access token
 		accessToken, err := jwt.GenerateAccessToken(payload, 2)
 		if err != nil {
-			return c.Status(http.StatusInternalServerError).JSON(utils.Responses{
-				Status:  http.StatusInternalServerError,
-				Message: "something went wrong!",
-			})
+			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
 
 		// generate refresh token
 		refreshToken, err := jwt.GenerateRefreshToken(payload, 2)
 		if err != nil {
-			return c.Status(http.StatusInternalServerError).JSON(utils.Responses{
-				Status:  http.StatusInternalServerError,
-				Message: "something went wrong!",
-			})
+			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
 
-		return c.Status(http.StatusOK).JSON(utils.Responses{
-			Status:  http.StatusOK,
-			Message: "user has been logged in!",
-			Data:    &fiber.Map{"accessToken": accessToken, "refreshToken": refreshToken},
-		})
+		return utils.ResponsesModel.Success(c, &fiber.Map{"accessToken": accessToken, "refreshToken": refreshToken})
 
 	})
 }
