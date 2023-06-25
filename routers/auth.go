@@ -14,6 +14,7 @@ type Auth struct {
 func (a *Auth) Init(app fiber.Router) {
 	a.app = app
 	a.authorization()
+	a.refresh()
 }
 
 func (a *Auth) authorization() {
@@ -30,5 +31,20 @@ func (a *Auth) authorization() {
 			"id":       validateToken.Payload.ID,
 			"username": validateToken.Payload.Username,
 		})
+	})
+}
+
+func (a *Auth) refresh() {
+	a.app.Post("/refresh", func(c *fiber.Ctx) error {
+		token := &utils.Tokens{}
+		if err := c.BodyParser(token); err != nil {
+			return utils.ResponsesModel.Error(c, fiber.StatusBadRequest, err.Error())
+		}
+
+		tokens, err := utils.RefreshTokens(*token)
+		if err != nil {
+			return utils.ResponsesModel.Error(c, fiber.StatusBadRequest, err.Error())
+		}
+		return utils.ResponsesModel.Success(c, &fiber.Map{"access_token": tokens.AccessToken, "refresh_token": tokens.RefreshToken})
 	})
 }

@@ -114,7 +114,7 @@ func (u *User) login() {
 		}
 
 		// generate access token
-		accessToken, err := accessJwt.GenerateToken(*accessTokenPayload, 1)
+		accessToken, err := accessJwt.GenerateToken(*accessTokenPayload)
 		if err != nil {
 			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
@@ -125,7 +125,7 @@ func (u *User) login() {
 		}
 
 		// generate refresh token
-		refreshToken, err := refreshJwt.GenerateToken(*refreshTokenPayload, 24)
+		refreshToken, err := refreshJwt.GenerateToken(*refreshTokenPayload)
 		if err != nil {
 			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
