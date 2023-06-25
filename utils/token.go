@@ -91,7 +91,7 @@ func (j *JWT[T]) generatePayload(payload *T, duration time.Duration) (*JwtPayloa
 	jp.Payload = payload
 	// set the default claims
 	jp.RegisteredClaims = jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration * time.Hour)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		Issuer:    "wisper",
 		Subject:   j.GetInstance().tokenType,
