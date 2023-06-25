@@ -12,6 +12,7 @@ func (r *Router) Load(app *fiber.App) {
 	r.root = r.app.Group("/wisper")
 	r.rootWelcome() // loading up /wisper welcome message
 	r.User()        // loading up user router
+	r.Auth()        // loading up auth router
 }
 
 func (r *Router) rootWelcome() {
@@ -24,4 +25,10 @@ func (r *Router) User() {
 	userApp := r.root.Group("/user")
 	user := User{}
 	user.Init(userApp)
+}
+
+func (r *Router) Auth() {
+	authApp := r.root.Group("/auth")
+	auth := Auth{}
+	auth.Init(authApp)
 }

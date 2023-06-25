@@ -46,10 +46,10 @@ func (r *Responses) BadRequest(ctx *fiber.Ctx, message string) error {
 	return ctx.Status(r.Status).JSON(r)
 }
 
-func (r *Responses) Unauthorized(ctx *fiber.Ctx) error {
+func (r *Responses) Unauthorized(ctx *fiber.Ctx, message string) error {
 	r.Status = 401
 	r.Message = "unauthorized"
-	r.Data = nil
+	r.Data = &fiber.Map{"message": message}
 	r.Timestamp = time.Now()
 	return ctx.Status(r.Status).JSON(r)
 }
