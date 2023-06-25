@@ -63,10 +63,10 @@ func (u *User) signup() {
 
 		// insert user
 		result, err := models.UserModel.InsertOne(ctx, user)
+
 		if err != nil {
 			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
-
 		return utils.ResponsesModel.Success(c, &fiber.Map{"id": result.InsertedID})
 	})
 }
@@ -104,26 +104,32 @@ func (u *User) login() {
 		}
 
 		// generate token
-		var jwt = utils.JWT{}
-		// generate payload
-		var payload = &utils.Payload{
-			ID:       user.Id,
+		accessJwt := utils.JWT[utils.AccessTokenRawPayload]{}
+		refreshJwt := utils.JWT[utils.RefreshTokenRawPayload]{}
+
+		// generate access token payload
+		accessTokenPayload := &utils.AccessTokenRawPayload{
+			ID:       foundUser.Id,
 			Username: user.Username,
 		}
 
 		// generate access token
-		accessToken, err := jwt.GenerateAccessToken(payload, 2)
+		accessToken, err := accessJwt.GenerateToken(*accessTokenPayload, 1)
 		if err != nil {
 			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
 
+		// generate refresh token payload
+		refreshTokenPayload := &utils.RefreshTokenRawPayload{
+			AccessToken: accessToken,
+		}
+
 		// generate refresh token
-		refreshToken, err := jwt.GenerateRefreshToken(payload, 2)
+		refreshToken, err := refreshJwt.GenerateToken(*refreshTokenPayload, 24)
 		if err != nil {
 			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
 
 		return utils.ResponsesModel.Success(c, &fiber.Map{"accessToken": accessToken, "refreshToken": refreshToken})
-
 	})
 }

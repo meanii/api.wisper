@@ -6,10 +6,10 @@ import (
 )
 
 type User struct {
-	Id       primitive.ObjectID   `json:"id,omitempty"`
+	Id       primitive.ObjectID   `json:"_id,omitempty" bson:"_id,omitempty"`
 	Username string               `json:"username,omitempty" validate:"required"`
 	Password string               `json:"password,omitempty" validate:"required"`
 	Friends  []primitive.ObjectID `json:"friends,omitempty"`
 }
 
-var UserModel = clients.GetDatabase().Collection("Users")
+var UserModel = clients.GetDatabase().Collection("users")
