@@ -1,10 +1,10 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/meanii/api.wisper/configs"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"log"
 	"reflect"
 	"time"
 )
@@ -37,34 +37,42 @@ type JwtPayload[T RawPayload] struct {
 	jwt.RegisteredClaims
 }
 
-func (j *JWT[T]) GetInstance() string {
-	accessToken := &JWT[AccessTokenRawPayload]{}
-	if reflect.TypeOf(j) == reflect.TypeOf(accessToken) {
-		return SecretToken
-	}
-	return RefreshToken
+type JwtInstance struct {
+	token     string
+	tokenType string
 }
 
+// GetInstance get the instance of the JWT
+func (j *JWT[T]) GetInstance() *JwtInstance {
+	accessToken := &JWT[AccessTokenRawPayload]{}
+	if reflect.TypeOf(j) == reflect.TypeOf(accessToken) {
+		return &JwtInstance{token: SecretToken, tokenType: "access_token"}
+	}
+	return &JwtInstance{token: RefreshToken, tokenType: "refresh_token"}
+}
+
+// GenerateToken generate the payload for the jwt
 func (j *JWT[T]) GenerateToken(payload T, hours time.Duration) (string, error) {
 	// Generate the token using the payload and other parameters
-	generatedPayload, err := generatePayload(&payload, hours)
+	generatedPayload, err := j.generatePayload(&payload, hours)
 	if err != nil {
-		log.Fatalln("Something went wrong while generating payload")
+		fmt.Println("Something went wrong while generating payload")
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, generatedPayload)
 
 	// Create the JWT string
-	tokenString, err := token.SignedString([]byte(j.GetInstance()))
+	tokenString, err := token.SignedString([]byte(j.GetInstance().token))
 	if err != nil {
-		log.Fatalln("Something went wrong while generating tokenString")
+		fmt.Println("Something went wrong while generating tokenString")
 	}
 	return tokenString, nil
 }
 
+// ValidateToken validate the token
 func (j *JWT[T]) ValidateToken(tokenString string) (*JwtPayload[T], error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &JwtPayload[T]{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(j.GetInstance()), nil
+		return []byte(j.GetInstance().token), nil
 	})
 
 	if err != nil {
@@ -77,7 +85,8 @@ func (j *JWT[T]) ValidateToken(tokenString string) (*JwtPayload[T], error) {
 	return payload, nil
 }
 
-func generatePayload[T RawPayload](payload *T, duration time.Duration) (*JwtPayload[T], error) {
+// generatePayload generate the payload for the jwt
+func (j *JWT[T]) generatePayload(payload *T, duration time.Duration) (*JwtPayload[T], error) {
 	jp := JwtPayload[T]{} // initialize the jwtPayload
 	jp.Payload = payload
 	// set the default claims
@@ -85,7 +94,7 @@ func generatePayload[T RawPayload](payload *T, duration time.Duration) (*JwtPayl
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(duration)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 		Issuer:    "wisper",
-		Subject:   "access_token",
+		Subject:   j.GetInstance().tokenType,
 	}
 	return &jp, nil
 }
