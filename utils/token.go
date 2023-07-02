@@ -16,8 +16,8 @@ var (
 )
 
 const (
-	RefreshTokenDuration = 24 * 7 // 7 days
-	AccessTokenDuration  = 24     // 1 day
+	RefreshTokenDuration = 24 * 2 // 2 days
+	AccessTokenDuration  = 6      // 6 hours
 )
 
 type Tokens struct {
@@ -45,7 +45,7 @@ type RawPayload interface {
 type JWT[T RawPayload] struct{}
 
 type JwtPayload[T RawPayload] struct {
-	Payload *T
+	Payload *T `json:"payload"`
 	jwt.RegisteredClaims
 }
 
