@@ -74,6 +74,11 @@ func (u *User) signup() {
 func (u *User) login() {
 	u.app.Post("/login", func(c *fiber.Ctx) error {
 
+		DefaultUserScoping := []string{
+			"user:read",
+			"user:write",
+		}
+
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var user = u.model
 		defer cancel()
@@ -111,6 +116,7 @@ func (u *User) login() {
 		accessTokenPayload := &utils.AccessTokenRawPayload{
 			ID:       foundUser.Id,
 			Username: user.Username,
+			Scopes:   DefaultUserScoping,
 		}
 
 		// generate access token

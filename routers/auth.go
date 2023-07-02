@@ -30,6 +30,7 @@ func (a *Auth) authorization() {
 		return utils.ResponsesModel.Success(c, &fiber.Map{
 			"id":       validateToken.Payload.ID,
 			"username": validateToken.Payload.Username,
+			"scopes":   validateToken.Payload.Scopes,
 		})
 	})
 }
