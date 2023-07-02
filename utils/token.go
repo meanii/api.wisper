@@ -29,6 +29,7 @@ type Tokens struct {
 type AccessTokenRawPayload struct {
 	ID       primitive.ObjectID `json:"id"`
 	Username string             `json:"username"`
+	Scopes   []string           `json:"scopes"`
 }
 
 // RefreshTokenRawPayload create a custom type for the claims
