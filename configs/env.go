@@ -5,7 +5,10 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"sync"
 )
+
+var lock = &sync.Mutex{}
 
 type Envs struct {
 	Port         string
@@ -31,12 +34,16 @@ func (e *Envs) LoadEnv() {
 
 var EnvInstance *Envs
 
-func init() {
-	// initialize static instance on load
-	EnvInstance = &Envs{}
-	EnvInstance.LoadEnv()
-}
-
+// GetConfig returns the singleton instance of Envs
 func GetConfig() *Envs {
+	if EnvInstance == nil {
+		lock.Lock()
+		defer lock.Unlock()
+		if EnvInstance == nil {
+			EnvInstance = &Envs{}
+			EnvInstance.LoadEnv()
+			fmt.Printf("loading env from sington: %v\n", EnvInstance)
+		}
+	}
 	return EnvInstance
 }

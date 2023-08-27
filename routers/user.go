@@ -38,6 +38,7 @@ func (u *User) signup() {
 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var user = u.model
+		var password = utils.Password{}
 		defer cancel()
 
 		if err := c.BodyParser(&user); err != nil {
@@ -55,7 +56,7 @@ func (u *User) signup() {
 		}
 
 		// encrypt password
-		hash, err := utils.Hash(user.Password)
+		hash, err := password.Hash(user.Password)
 		if err != nil {
 			return utils.ResponsesModel.Error(c, http.StatusInternalServerError, fmt.Sprintf("something went wrong! ERROR: %s", err.Error()))
 		}
@@ -81,6 +82,7 @@ func (u *User) login() {
 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var user = u.model
+		var password = utils.Password{}
 		defer cancel()
 
 		if err := c.BodyParser(&user); err != nil {
@@ -104,7 +106,7 @@ func (u *User) login() {
 		}
 
 		// validate password
-		if err := utils.Verify(user.Password, foundUser.Password); err != nil {
+		if err := password.Verify(user.Password, foundUser.Password); err != nil {
 			return utils.ResponsesModel.Error(c, http.StatusUnauthorized, "username or password is incorrect!")
 		}
 

@@ -3,17 +3,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"strings"
+	"time"
+
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/gofiber/storage/redis/v2"
 	"github.com/meanii/api.wisper/clients"
 	"github.com/meanii/api.wisper/routers"
-	"log"
-	"runtime"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -35,16 +35,6 @@ func main() {
 	// load the .env file
 	env := configs.GetConfig()
 
-	// setting up redis
-	storage := redis.New(redis.Config{
-		Host:      env.RedisUrl,
-		Port:      6379,
-		Database:  0,
-		Reset:     false,
-		TLSConfig: nil,
-		PoolSize:  10 * runtime.GOMAXPROCS(0),
-	})
-
 	// connecting to mongodb
 	_ = clients.GetClient()
 
@@ -64,8 +54,10 @@ func main() {
 
 	// setting up limiter
 	app.Use(limiter.New(limiter.Config{
-		Max:        20,
-		Expiration: 30 * time.Second,
+		Max:                    20,
+		Expiration:             30 * time.Second,
+		SkipFailedRequests:     false,
+		SkipSuccessfulRequests: false,
 		KeyGenerator: func(c *fiber.Ctx) string {
 			return c.Get("x-forwarded-for")
 		},
@@ -79,10 +71,10 @@ func main() {
 	// setting up cache
 	app.Use(cache.New(cache.Config{
 		Next: func(c *fiber.Ctx) bool {
-			return c.Query("refresh") == "true"
+			return (strings.Contains(c.Route().Path, "/ws")) || (c.Query("refresh") == "true")
 		},
 		CacheHeader:  "x-wisper-cache",
-		Storage:      storage,
+		Storage:      clients.RedisClient.Storage,
 		Expiration:   30 * time.Minute,
 		CacheControl: true,
 	}))
