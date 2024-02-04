@@ -2,10 +2,11 @@ package configs
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"sync"
+
+	"github.com/joho/godotenv"
 )
 
 var lock = &sync.Mutex{}

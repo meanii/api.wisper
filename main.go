@@ -7,18 +7,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	"github.com/meanii/api.wisper/clients"
-	"github.com/meanii/api.wisper/routers"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	configs "github.com/meanii/api.wisper/configs"
+	"github.com/meanii/api.wisper/clients"
+	"github.com/meanii/api.wisper/configs"
+	"github.com/meanii/api.wisper/routers"
 )
 
 func main() {
@@ -95,5 +95,4 @@ func main() {
 	if err != nil {
 		log.Panic("could not start server, ERROR: ", err)
 	}
-
 }

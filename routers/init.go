@@ -2,6 +2,7 @@ package routers
 
 import (
 	"github.com/gofiber/fiber/v2"
+
 	wws "github.com/meanii/api.wisper/routers/ws"
 )
 
@@ -29,7 +30,6 @@ func (r *Router) WS() {
 	wsApp := r.root.Group("/ws")
 	ws := wws.Server{}
 	ws.Init(wsApp)
-
 }
 
 func (r *Router) User() {

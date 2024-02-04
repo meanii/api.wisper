@@ -2,6 +2,7 @@ package routers
 
 import (
 	"github.com/gofiber/fiber/v2"
+
 	"github.com/meanii/api.wisper/models"
 	"github.com/meanii/api.wisper/utils"
 )
@@ -46,6 +47,9 @@ func (a *Auth) refresh() {
 		if err != nil {
 			return utils.ResponsesModel.Error(c, fiber.StatusBadRequest, err.Error())
 		}
-		return utils.ResponsesModel.Success(c, &fiber.Map{"access_token": tokens.AccessToken, "refresh_token": tokens.RefreshToken})
+		return utils.ResponsesModel.Success(
+			c,
+			&fiber.Map{"access_token": tokens.AccessToken, "refresh_token": tokens.RefreshToken},
+		)
 	})
 }

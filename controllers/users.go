@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"context"
+	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+
 	"github.com/meanii/api.wisper/clients"
 	"github.com/meanii/api.wisper/models"
-	"go.mongodb.org/mongo-driver/mongo"
-	"time"
 )
 
 const (

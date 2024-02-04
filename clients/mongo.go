@@ -6,9 +6,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/meanii/api.wisper/configs"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/meanii/api.wisper/configs"
 )
 
 type Mongo struct{}
@@ -30,7 +31,7 @@ func (m *Mongo) Connect() *mongo.Client {
 		log.Fatal(err)
 	}
 
-	//ping the database
+	// ping the database
 	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Fatal(err)

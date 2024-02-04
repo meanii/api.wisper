@@ -1,9 +1,11 @@
 package clients
 
 import (
-	"github.com/gofiber/storage/redis/v2"
-	"github.com/meanii/api.wisper/configs"
 	"runtime"
+
+	"github.com/gofiber/storage/redis/v2"
+
+	"github.com/meanii/api.wisper/configs"
 )
 
 func NewRedisClient(host string) *redis.Storage {

@@ -1,8 +1,9 @@
 package utils
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type Responses struct {

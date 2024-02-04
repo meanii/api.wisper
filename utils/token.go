@@ -3,11 +3,13 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/meanii/api.wisper/configs"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"reflect"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"github.com/meanii/api.wisper/configs"
 )
 
 var (
@@ -59,14 +61,21 @@ type JwtInstance struct {
 func (j *JWT[T]) GetInstance() *JwtInstance {
 	accessToken := &JWT[AccessTokenRawPayload]{}
 	if reflect.TypeOf(j) == reflect.TypeOf(accessToken) {
-		return &JwtInstance{token: SecretToken, tokenType: "access_token", expiredAt: AccessTokenDuration}
+		return &JwtInstance{
+			token:     SecretToken,
+			tokenType: "access_token",
+			expiredAt: AccessTokenDuration,
+		}
 	}
-	return &JwtInstance{token: RefreshToken, tokenType: "refresh_token", expiredAt: RefreshTokenDuration}
+	return &JwtInstance{
+		token:     RefreshToken,
+		tokenType: "refresh_token",
+		expiredAt: RefreshTokenDuration,
+	}
 }
 
 // GenerateToken generate the payload for the jwt
 func (j *JWT[T]) GenerateToken(payload T) (string, error) {
-
 	// Generate the token using the payload and other parameters
 	generatedPayload, err := j.generatePayload(&payload, j.GetInstance().expiredAt)
 	if err != nil {
@@ -84,11 +93,13 @@ func (j *JWT[T]) GenerateToken(payload T) (string, error) {
 
 // ValidateToken validate the token
 func (j *JWT[T]) ValidateToken(tokenString string) (*JwtPayload[T], error) {
-
-	token, err := jwt.ParseWithClaims(tokenString, &JwtPayload[T]{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(j.GetInstance().token), nil
-	})
-
+	token, err := jwt.ParseWithClaims(
+		tokenString,
+		&JwtPayload[T]{},
+		func(token *jwt.Token) (interface{}, error) {
+			return []byte(j.GetInstance().token), nil
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
