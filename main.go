@@ -32,11 +32,10 @@ func main() {
 		AppName:       "wisper V0.0.1-dev.beta",
 	})
 
-	// load the .env file
-	env := configs.GetConfig()
+	configs.InitConfig()
 
 	// connecting to mongodb
-	_ = clients.GetClient()
+	clients.MongoInit()
 
 	// setting up middlewares
 	app.Use(cors.New())
@@ -90,9 +89,9 @@ func main() {
 		return c.SendString("welcome to wisper api gatway ☂️.")
 	})
 
-	PORT := fmt.Sprintf(":%s", env.Port)
+	PORT := fmt.Sprintf(":%s", configs.Env.Port)
 	err := app.Listen(PORT)
 	if err != nil {
-		log.Panic("could not start server, ERROR: ", err)
+		log.Panicf("could not start server, ERROR: %v", err)
 	}
 }

@@ -2,7 +2,6 @@ package clients
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -12,44 +11,29 @@ import (
 	"github.com/meanii/api.wisper/configs"
 )
 
-type Mongo struct{}
+var MongoClient *mongo.Client
 
-const (
-	DATABASE = "wisper-local"
-)
-
-func (m *Mongo) Connect() *mongo.Client {
-	mongodbUrl := configs.GetConfig().MongoUrl
-	client, err := mongo.NewClient(options.Client().ApplyURI(mongodbUrl))
+func connect() *mongo.Client {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(configs.Env.MongoUrl))
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	err = client.Connect(ctx)
-	if err != nil {
-		log.Fatal(err)
+		log.Panicf("Failed to connect to MongoDB %s.\n", configs.Env.MongoUrl)
 	}
 
 	// ping the database
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Panicf("Failed to ping MongoDB %s.\n", configs.Env.MongoUrl)
 	}
-	fmt.Printf("Connected to MongoDB %s.\n", mongodbUrl)
+	log.Fatalf("Connected to MongoDB %s.\n", configs.Env.MongoUrl)
 	return client
 }
 
-var MongoClient *Mongo
-
-func init() {
-	MongoClient.Connect()
-}
-
-func GetClient() *mongo.Client {
-	return MongoClient.Connect()
+func MongoInit() {
+	MongoClient = connect()
 }
 
 func GetDatabase() *mongo.Database {
-	return GetClient().Database(DATABASE)
+	return MongoClient.Database(configs.Env.Database)
 }

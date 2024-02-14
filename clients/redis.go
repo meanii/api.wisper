@@ -22,7 +22,7 @@ func NewRedisClient(host string) *redis.Storage {
 	return storage
 }
 
-var redisClient = NewRedisClient(configs.GetConfig().RedisUrl)
+var redisClient = NewRedisClient(configs.Env.RedisUrl)
 
 type Redis struct {
 	Storage *redis.Storage

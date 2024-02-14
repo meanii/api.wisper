@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	SecretToken  = configs.GetConfig().SecretToken
-	RefreshToken = configs.GetConfig().RefreshToken
+	SecretToken  = configs.Env.SecretToken
+	RefreshToken = configs.Env.RefreshToken
 )
 
 const (
