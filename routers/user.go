@@ -17,11 +17,12 @@ import (
 var validate = validator.New()
 
 type User struct {
-	model models.User
+	model *models.User
 	app   fiber.Router
 }
 
 func (u *User) Init(app fiber.Router) {
+	u.model = &models.User{}
 	u.app = app
 	u.welcome()
 	u.signup()
@@ -59,7 +60,7 @@ func (u *User) signup() {
 
 		// check if user already exists
 		var userExists models.User
-		if err := models.UserModel.FindOne(ctx, bson.M{"username": user.Username}).Decode(&userExists); err == nil {
+		if err := u.model.Collection().FindOne(ctx, bson.M{"username": user.Username}).Decode(&userExists); err == nil {
 			return utils.ResponsesModel.Error(
 				c,
 				http.StatusBadRequest,
@@ -79,7 +80,7 @@ func (u *User) signup() {
 		user.Password = hash
 
 		// insert user
-		result, err := models.UserModel.InsertOne(ctx, user)
+		result, err := u.model.Collection().InsertOne(ctx, user)
 		if err != nil {
 			return utils.ResponsesModel.Error(
 				c,
@@ -119,7 +120,7 @@ func (u *User) login() {
 			)
 		}
 
-		result := models.UserModel.FindOne(ctx, bson.M{"username": user.Username})
+		result := u.model.Collection().FindOne(ctx, bson.M{"username": user.Username})
 		if result.Err() != nil {
 			return utils.ResponsesModel.Error(
 				c,

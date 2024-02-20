@@ -2,6 +2,7 @@ package models
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/meanii/api.wisper/clients"
 )
@@ -13,4 +14,6 @@ type User struct {
 	Friends  []primitive.ObjectID `json:"friends,omitempty"`
 }
 
-var UserModel = clients.GetDatabase().Collection("users")
+func (u *User) Collection() *mongo.Collection {
+	return clients.GetDatabase().Collection("users")
+}

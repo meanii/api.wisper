@@ -12,11 +12,6 @@ import (
 	"github.com/meanii/api.wisper/configs"
 )
 
-var (
-	SecretToken  = configs.Env.SecretToken
-	RefreshToken = configs.Env.RefreshToken
-)
-
 const (
 	RefreshTokenDuration = 24 * 2 // 2 days
 	AccessTokenDuration  = 6      // 6 hours
@@ -62,13 +57,13 @@ func (j *JWT[T]) GetInstance() *JwtInstance {
 	accessToken := &JWT[AccessTokenRawPayload]{}
 	if reflect.TypeOf(j) == reflect.TypeOf(accessToken) {
 		return &JwtInstance{
-			token:     SecretToken,
+			token:     configs.Env.SecretToken,
 			tokenType: "access_token",
 			expiredAt: AccessTokenDuration,
 		}
 	}
 	return &JwtInstance{
-		token:     RefreshToken,
+		token:     configs.Env.RefreshToken,
 		tokenType: "refresh_token",
 		expiredAt: RefreshTokenDuration,
 	}

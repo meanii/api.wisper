@@ -6,7 +6,7 @@ require (
 	github.com/go-playground/validator/v10 v10.18.0
 	github.com/gofiber/contrib/websocket v1.3.0
 	github.com/gofiber/fiber/v2 v2.52.0
-	github.com/gofiber/storage/redis/v2 v2.0.3
+	github.com/gofiber/storage/redis v1.3.4
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/spf13/viper v1.18.2
 	go.mongodb.org/mongo-driver v1.13.1
@@ -22,6 +22,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

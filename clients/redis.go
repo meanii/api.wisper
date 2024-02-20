@@ -3,10 +3,16 @@ package clients
 import (
 	"runtime"
 
-	"github.com/gofiber/storage/redis/v2"
+	"github.com/gofiber/storage/redis"
 
 	"github.com/meanii/api.wisper/configs"
 )
+
+var RedisClient = *&redisClient{}
+
+type redisClient struct {
+	Storage *redis.Storage
+}
 
 func NewRedisClient(host string) *redis.Storage {
 	// setting up redis
@@ -22,12 +28,6 @@ func NewRedisClient(host string) *redis.Storage {
 	return storage
 }
 
-var redisClient = NewRedisClient(configs.Env.RedisUrl)
-
-type Redis struct {
-	Storage *redis.Storage
-}
-
-var RedisClient = &Redis{
-	Storage: redisClient,
+func RedisInit() {
+	RedisClient.Storage = NewRedisClient(configs.Env.RedisUrl)
 }

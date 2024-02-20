@@ -26,7 +26,9 @@ func connect() *mongo.Client {
 	if err != nil {
 		log.Panicf("Failed to ping MongoDB %s.\n", configs.Env.MongoUrl)
 	}
-	log.Fatalf("Connected to MongoDB %s.\n", configs.Env.MongoUrl)
+
+	log.Printf("Connected to MongoDB %s.\n", configs.Env.MongoUrl)
+
 	return client
 }
 
