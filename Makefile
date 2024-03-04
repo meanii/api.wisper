@@ -4,7 +4,7 @@ BIN_DIR=bin
 build:
 	@mkdir -p ${BINARY_NAME}
 	@echo "Building ${BINARY_NAME} for current platform..."
-	@go build -o ${BINARY_NAME}/${BINARY_NAME} main.go
+	@go build -o ${BIN_DIR}/${BINARY_NAME} main.go
 
 compile:
 	@mkdir -p ${BIN_DIR}
@@ -17,7 +17,7 @@ compile:
 
 run: build
 	@echo "Running ${BINARY_NAME}..."
-	@./${BINARY_NAME}/${BINARY_NAME}
+	@./${BIN}/${BINARY_NAME}
 
 dep:
 	@echo "Installing dependencies..."

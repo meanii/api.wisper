@@ -30,6 +30,21 @@ func main() {
 		StrictRouting: false,
 		ServerHeader:  "wisper",
 		AppName:       "wisper V0.0.1-dev.beta",
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			// Default 500 status code
+			code := fiber.StatusInternalServerError
+			// Retreive the custom status code if it's an fiber.*Error
+			if e, ok := err.(*fiber.Error); ok {
+				code = e.Code
+			}
+			// Send custom error page
+			return c.Status(code).JSON(fiber.Map{
+				"message":   err.Error(),
+				"status":    "error",
+				"code":      code,
+				"timestamp": time.Now(),
+			})
+		},
 	})
 
 	configs.InitConfig()
@@ -48,7 +63,7 @@ func main() {
 
 	// setting up logger
 	app.Use(logger.New(logger.Config{
-		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
+		Format: "[${ip}]:${port} ${status} - ${method} ${url}\n",
 	}))
 
 	// setting up limiter
@@ -72,8 +87,8 @@ func main() {
 		Next: func(c *fiber.Ctx) bool {
 			return (strings.Contains(c.Route().Path, "/ws")) || (c.Query("refresh") == "true")
 		},
-		CacheHeader:  "x-wisper-cache",
-		Storage:      clients.RedisClient.Storage,
+		CacheHeader: "x-wisper-cache",
+		// Storage:      clients.RedisClient.Storage,
 		Expiration:   30 * time.Minute,
 		CacheControl: true,
 	}))
