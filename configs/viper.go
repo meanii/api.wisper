@@ -8,6 +8,8 @@ import (
 
 var Env *envs
 
+const WisperVersion = "0.0.2-dev.beta"
+
 type envs struct {
 	Port         string `mapstructure:"PORT"`
 	MongoUrl     string `mapstructure:"MONGO_URI"`

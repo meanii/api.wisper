@@ -15,6 +15,7 @@ func (r *Router) Load(app *fiber.App) {
 	r.app = app
 	r.root = r.app.Group("/wisper")
 	r.rootWelcome() // loading up /wisper welcome message
+	r.Status()      // loading up status router
 	r.User()        // loading up user router
 	r.Auth()        // loading up auth router
 	r.WS()          // loading up ws router
@@ -42,4 +43,10 @@ func (r *Router) Auth() {
 	authApp := r.root.Group("/auth")
 	auth := Auth{}
 	auth.Init(authApp)
+}
+
+func (r *Router) Status() {
+	statusApp := r.root.Group("/status")
+	status := Status{}
+	status.Init(statusApp)
 }
